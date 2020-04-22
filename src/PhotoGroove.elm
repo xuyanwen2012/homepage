@@ -2,7 +2,7 @@ module PhotoGroove exposing (hum)
 
 import Array exposing (Array)
 import Browser
-import Html exposing (Html, button, div, h1, img, text)
+import Html exposing (Html, button, div, h1, img, input, label, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
@@ -12,12 +12,18 @@ urlPrefix =
     "http://elm-in-action.com/"
 
 
+type ThumbnailSize
+    = Small
+    | Medium
+    | Large
+
+
 
 ---- MODEL ----
 
 
 type alias Model =
-    { photos : List Photo, selectedUrl : String }
+    { photos : List Photo, selectedUrl : String, chosenSize : ThumbnailSize }
 
 
 type alias Photo =
@@ -32,6 +38,7 @@ init =
         , { url = "3.jpeg" }
         ]
     , selectedUrl = "1.jpeg"
+    , chosenSize = Medium
     }
 
 
@@ -70,7 +77,9 @@ view model =
         , button
             [ onClick ButtonClick ]
             [ text "Surprise  Me!" ]
-        , div [ id "thumbnails" ]
+        , div [ id "choose-size" ]
+            (List.map viewSizeChooser [ Small, Medium, Large ])
+        , div [ id "thumbnails", class (sizeToClass model.chosenSize) ]
             (List.map
                 (viewThumbnail model.selectedUrl)
                 model.photos
@@ -93,6 +102,40 @@ viewThumbnail selectedUrl thumb =
         , onClick (ImgClick thumb.url)
         ]
         []
+
+
+viewSizeChooser : ThumbnailSize -> Html Msg
+viewSizeChooser size =
+    label []
+        [ input [ type_ "radio", name "size" ] []
+        , text (sizeToString size)
+        ]
+
+
+sizeToString : ThumbnailSize -> String
+sizeToString size =
+    case size of
+        Small ->
+            "small"
+
+        Medium ->
+            "med"
+
+        Large ->
+            "large"
+
+
+sizeToClass : ThumbnailSize -> String
+sizeToClass size =
+    case size of
+        Small ->
+            "small"
+
+        Medium ->
+            "med"
+
+        Large ->
+            "large"
 
 
 
