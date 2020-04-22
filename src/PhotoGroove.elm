@@ -32,8 +32,6 @@ init =
 
 
 ---- UPDATE ----
---type alias Msg =
---    { description : String, data : String }
 
 
 type Msg
