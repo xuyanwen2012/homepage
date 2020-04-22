@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, button, div, h1, img, input, label, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Http
 import Random
 
 
@@ -43,8 +44,16 @@ init =
     ( { status = Loading
       , chosenSize = Medium
       }
-    , Cmd.none
+    , initCmd
     )
+
+
+initCmd : Cmd Msg
+initCmd =
+    Http.get
+        { url = "http://elm-in-action.com/photos/list"
+        , expect = Http.expectString GotPhotos
+        }
 
 
 
@@ -56,6 +65,7 @@ type Msg
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
     | GotRandomPhoto Photo
+    | GotPhotos (Result Http.Error String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -79,6 +89,21 @@ update msg model =
 
         GotRandomPhoto photo ->
             ( { model | status = selectUrl photo.url model.status }, Cmd.none )
+
+        GotPhotos (Ok responseStr) ->
+            case String.split "," responseStr of
+                (firstUrl :: _) as urls ->
+                    let
+                        photos =
+                            List.map Photo urls
+                    in
+                    ( { model | status = Loaded photos firstUrl }, Cmd.none )
+
+                [] ->
+                    ( { model | status = Errored "0 photos found" }, Cmd.none )
+
+        GotPhotos (Err _) ->
+            ( { model | status = Errored "Server Error!" }, Cmd.none )
 
 
 selectUrl : String -> Status -> Status
@@ -193,7 +218,6 @@ sizeToClass size =
 hum : Program () Model Msg
 hum =
     Browser.element
-        --{ init = \_ -> ( init, Cmd.none )
         { init = \_ -> init
         , view = view
         , update = update
