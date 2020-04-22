@@ -5,6 +5,7 @@ import Browser
 import Html exposing (Html, button, div, h1, img, input, label, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Random
 
 
 urlPrefix : String
@@ -26,6 +27,8 @@ type alias Model =
     { photos : List Photo, selectedUrl : String, chosenSize : ThumbnailSize }
 
 
+{-| Photo Item is represented by a string of the filename
+-}
 type alias Photo =
     { url : String }
 
@@ -52,18 +55,36 @@ photoArray =
 
 
 type Msg
-    = ImgClick String
-    | ButtonClick
+    = ClickedPhoto String
+    | ClickedSize ThumbnailSize
+    | ClickedSurpriseMe
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        ImgClick data ->
-            { model | selectedUrl = data }
+        ClickedPhoto url ->
+            { model | selectedUrl = url }
 
-        ButtonClick ->
+        ClickedSize size ->
+            { model | chosenSize = size }
+
+        ClickedSurpriseMe ->
             { model | selectedUrl = "2.jpeg" }
+
+
+getPhotoUrl index =
+    case Array.get index photoArray of
+        Just photo ->
+            photo.url
+
+        Nothing ->
+            ""
+
+
+randomPhotoPicker : Random.Generator Int
+randomPhotoPicker =
+    Random.int 0 (Array.length photoArray - 1)
 
 
 
@@ -75,10 +96,15 @@ view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , button
-            [ onClick ButtonClick ]
+            [ onClick ClickedSurpriseMe ]
             [ text "Surprise  Me!" ]
         , div [ id "choose-size" ]
             (List.map viewSizeChooser [ Small, Medium, Large ])
+
+        --[ viewSizeChooser Small (model.selectedUrl == sizeToString Small)
+        --, viewSizeChooser Medium (model.selectedUrl == sizeToString Medium)
+        --, viewSizeChooser Large (model.selectedUrl == sizeToString Large)
+        --]
         , div [ id "thumbnails", class (sizeToClass model.chosenSize) ]
             (List.map
                 (viewThumbnail model.selectedUrl)
@@ -99,15 +125,25 @@ viewThumbnail selectedUrl thumb =
         , classList
             [ ( "selected", selectedUrl == thumb.url )
             ]
-        , onClick (ImgClick thumb.url)
+        , onClick (ClickedPhoto thumb.url)
         ]
         []
+
+
+
+--viewSizeChooser : ThumbnailSize -> Bool -> Html Msg
+--viewSizeChooser size isChecked =
 
 
 viewSizeChooser : ThumbnailSize -> Html Msg
 viewSizeChooser size =
     label []
-        [ input [ type_ "radio", name "size" ] []
+        [ input
+            [ type_ "radio"
+            , name "size"
+            , onClick (ClickedSize size)
+            ]
+            []
         , text (sizeToString size)
         ]
 
