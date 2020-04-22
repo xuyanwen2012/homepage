@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser
 import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (src)
+import PhotoGroove exposing (hum)
 
 
 
@@ -39,7 +40,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+        , h1 [] [ text "Your Elm 2 App is working!" ]
         ]
 
 
@@ -47,11 +48,17 @@ view model =
 ---- PROGRAM ----
 
 
-main : Program () Model Msg
 main =
-    Browser.element
-        { view = view
-        , init = \_ -> init
-        , update = update
-        , subscriptions = always Sub.none
-        }
+    hum
+
+
+
+--
+--main : Program () Model Msg
+--main =
+--    Browser.element
+--        { view = view
+--        , init = \_ -> init
+--        , update = update
+--        , subscriptions = always Sub.none
+--        }
