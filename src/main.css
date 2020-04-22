@@ -1,62 +1,62 @@
-/*!**/
-/*  elm-hot creates an additional div wrapper around the app to make HMR possible.*/
-/*  This could break styling in development mode if you are using Elm UI.*/
+/*!*!**!*/
+/*!*  elm-hot creates an additional div wrapper around the app to make HMR possible.*!*/
+/*!*  This could break styling in development mode if you are using Elm UI.*!*/
 
-/*  More context in the issue:*/
-/*    https://github.com/halfzebra/create-elm-app/issues/320*/
-/**!*/
-[data-elm-hot="true"] {
-    height: inherit;
-}
+/*!*  More context in the issue:*!*/
+/*!*    https://github.com/halfzebra/create-elm-app/issues/320*!*/
+/*!**!*!*/
+/*[data-elm-hot="true"] {*/
+/*    height: inherit;*/
+/*}*/
+
+/*!*body {*!*/
+/*!*    font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;*!*/
+/*!*    margin: 0;*!*/
+/*!*    text-align: center;*!*/
+/*!*    color: #293c4b;*!*/
+/*!*}*!*/
+
+/*!*h1 {*!*/
+/*!*    font-size: 30px;*!*/
+/*!*}*!*/
+
+/*!*img {*!*/
+/*!*    margin: 20px 0;*!*/
+/*!*    max-width: 200px;*!*/
+/*!*}*!*/
 
 /*body {*/
-/*    font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;*/
+/*    background-color: rgb(44, 44, 44);*/
+/*    color: white;*/
+/*}*/
+
+/*img {*/
+/*    border: 1px solid white;*/
+/*    margin: 5px;*/
+/*}*/
+
+/*.large {*/
+/*    width: 500px;*/
+/*    float: right;*/
+/*}*/
+
+/*.selected {*/
 /*    margin: 0;*/
-/*    text-align: center;*/
-/*    color: #293c4b;*/
+/*    border: 6px solid #60b5cc;*/
+/*}*/
+
+/*.content {*/
+/*    margin: 40px auto;*/
+/*    width: 960px;*/
+/*}*/
+
+/*#thumbnails {*/
+/*    width: 440px;*/
+/*    float: left;*/
 /*}*/
 
 /*h1 {*/
 /*    font-size: 30px;*/
+/*    font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;*/
+/*    color: #60b5cc;*/
 /*}*/
-
-/*img {*/
-/*    margin: 20px 0;*/
-/*    max-width: 200px;*/
-/*}*/
-
-body {
-    background-color: rgb(44, 44, 44);
-    color: white;
-}
-
-img {
-    border: 1px solid white;
-    margin: 5px;
-}
-
-.large {
-    width: 500px;
-    float: right;
-}
-
-.selected {
-    margin: 0;
-    border: 6px solid #60b5cc;
-}
-
-.content {
-    margin: 40px auto;
-    width: 960px;
-}
-
-#thumbnails {
-    width: 440px;
-    float: left;
-}
-
-h1 {
-    font-size: 30px;
-    font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
-    color: #60b5cc;
-}
