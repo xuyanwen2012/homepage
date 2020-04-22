@@ -1,6 +1,5 @@
 module PhotoGroove exposing (hum)
 
-import Array exposing (Array)
 import Browser
 import Html exposing (Html, button, div, h1, img, input, label, text)
 import Html.Attributes exposing (..)
