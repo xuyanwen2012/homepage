@@ -33,21 +33,24 @@ type alias Photo =
     { url : String }
 
 
-init : Model
+init : ( Model, Cmd Msg )
 init =
-    { photos =
-        [ { url = "1.jpeg" }
-        , { url = "2.jpeg" }
-        , { url = "3.jpeg" }
-        ]
-    , selectedUrl = "1.jpeg"
-    , chosenSize = Medium
-    }
+    ( { photos =
+            [ { url = "1.jpeg" }
+            , { url = "2.jpeg" }
+            , { url = "3.jpeg" }
+            ]
+      , selectedUrl = "1.jpeg"
+      , chosenSize = Medium
+      }
+    , Cmd.none
+    )
 
 
 photoArray : Array Photo
 photoArray =
-    Array.fromList init.photos
+    --Array.fromList init.photos
+    Array.fromList (Tuple.first init).photos
 
 
 
@@ -58,19 +61,23 @@ type Msg
     = ClickedPhoto String
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
+    | GotSelectedIndex Int
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickedPhoto url ->
-            { model | selectedUrl = url }
+            ( { model | selectedUrl = url }, Cmd.none )
 
         ClickedSize size ->
-            { model | chosenSize = size }
+            ( { model | chosenSize = size }, Cmd.none )
 
         ClickedSurpriseMe ->
-            { model | selectedUrl = "2.jpeg" }
+            ( model, Random.generate GotSelectedIndex randomPhotoPicker )
+
+        GotSelectedIndex index ->
+            ( { model | selectedUrl = getPhotoUrl index }, Cmd.none )
 
 
 getPhotoUrl index =
@@ -178,9 +185,12 @@ sizeToClass size =
 ---- PROGRAM ----
 
 
+hum : Program () Model Msg
 hum =
-    Browser.sandbox
-        { init = init
+    Browser.element
+        --{ init = \_ -> ( init, Cmd.none )
+        { init = \_ -> init
         , view = view
         , update = update
+        , subscriptions = always Sub.none
         }

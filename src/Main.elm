@@ -46,6 +46,7 @@ view model =
 
 
 ---- PROGRAM ----
+--main : Program () Model Msg
 
 
 main =
