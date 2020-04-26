@@ -13,13 +13,32 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
     <link href="http://elm-in-action.com/styles.css" rel="stylesheet">
+    <link href="http://elm-in-action.com/range-slider.css" rel="stylesheet">
+    <script src="http://elm-in-action.com/range-slider.js"></script>
     <title>Elm App</title>
     <script>
       class RangeSlider extends HTMLElement {
         connectedCallback() {
-          const input = document.createElement("input");
+          const input = document.createElement('input');
           this.appendChild(input);
+
+          const jsr = new JSR(input, {
+            max: this.max,
+            values: [this.val],
+            sliders: 1,
+            grid: false
+          });
+
+          jsr.addEventListener('update', (elem, value) => {
+            const event = new CustomEvent("slide", {
+              detail: {userSlidTo: value}
+            });
+
+            this.dispatchEvent(event)
+          })
         }
+
+
       }
 
       window.customElements.define("range-slider", RangeSlider);
