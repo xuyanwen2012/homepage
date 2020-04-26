@@ -2,9 +2,11 @@ module PhotoGroove exposing (hum)
 
 import Browser
 import Html exposing (Html, button, div, h1, img, input, label, text)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (class, classList, id, name, src, title, type_)
 import Html.Events exposing (onClick)
 import Http
+import Json.Decode exposing (Decoder, field, int, list, map3, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
 import Random
 
 
@@ -36,7 +38,10 @@ type alias Model =
 {-| Photo Item is represented by a string of the filename
 -}
 type alias Photo =
-    { url : String }
+    { url : String
+    , size : Int
+    , title : String
+    }
 
 
 init : ( Model, Cmd Msg )
@@ -51,9 +56,22 @@ init =
 initCmd : Cmd Msg
 initCmd =
     Http.get
-        { url = "http://elm-in-action.com/photos/list"
-        , expect = Http.expectString GotPhotos
+        { url = "http://elm-in-action.com/photos/list.json"
+        , expect = Http.expectJson GotPhotos (list photoDecoder)
         }
+
+
+photoDecoder : Decoder Photo
+photoDecoder =
+    succeed buildPhoto
+        |> required "url" string
+        |> required "size" int
+        |> optional "title" string "(untitled)"
+
+
+buildPhoto : String -> Int -> String -> Photo
+buildPhoto url size title =
+    { url = url, size = size, title = title }
 
 
 
@@ -65,7 +83,7 @@ type Msg
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
     | GotRandomPhoto Photo
-    | GotPhotos (Result Http.Error String)
+    | GotPhotos (Result Http.Error (List Photo))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,14 +108,10 @@ update msg model =
         GotRandomPhoto photo ->
             ( { model | status = selectUrl photo.url model.status }, Cmd.none )
 
-        GotPhotos (Ok responseStr) ->
-            case String.split "," responseStr of
-                (firstUrl :: _) as urls ->
-                    let
-                        photos =
-                            List.map Photo urls
-                    in
-                    ( { model | status = Loaded photos firstUrl }, Cmd.none )
+        GotPhotos (Ok photos) ->
+            case photos of
+                first :: _ ->
+                    ( { model | status = Loaded photos first.url }, Cmd.none )
 
                 [] ->
                     ( { model | status = Errored "0 photos found" }, Cmd.none )
@@ -159,9 +173,8 @@ viewThumbnail : String -> Photo -> Html Msg
 viewThumbnail selectedUrl thumb =
     img
         [ src (urlPrefix ++ thumb.url)
-        , classList
-            [ ( "selected", selectedUrl == thumb.url )
-            ]
+        , title (thumb.title ++ "[" ++ String.fromInt thumb.size ++ "KB ]")
+        , classList [ ( "selected", selectedUrl == thumb.url ) ]
         , onClick (ClickedPhoto thumb.url)
         ]
         []
