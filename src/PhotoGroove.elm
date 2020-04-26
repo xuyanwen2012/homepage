@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, h1, img, input, label, text)
 import Html.Attributes exposing (class, classList, id, name, src, title, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (Decoder, field, int, list, map3, string, succeed)
+import Json.Decode exposing (Decoder, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (optional, required)
 import Random
 
