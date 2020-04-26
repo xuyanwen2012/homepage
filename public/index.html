@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no"
+          name="viewport">
     <meta name="theme-color" content="#000000">
     <!--
       manifest.json provides metadata used when your web app is added to the
@@ -13,11 +14,21 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico">
     <link href="http://elm-in-action.com/styles.css" rel="stylesheet">
     <title>Elm App</title>
+    <script>
+      class RangeSlider extends HTMLElement {
+        connectedCallback() {
+          const input = document.createElement("input");
+          this.appendChild(input);
+        }
+      }
+
+      window.customElements.define("range-slider", RangeSlider);
+    </script>
 </head>
 <body>
-    <noscript>
-        You need to enable JavaScript to run this app.
-    </noscript>
-    <div id="root"></div>
+<noscript>
+    You need to enable JavaScript to run this app.
+</noscript>
+<div id="root"></div>
 </body>
 </html>
