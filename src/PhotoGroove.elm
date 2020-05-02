@@ -1,4 +1,4 @@
-module PhotoGroove exposing (hum)
+port module PhotoGroove exposing (hum)
 
 import Browser
 import Html exposing (Html, button, div, h1, img, input, label, node, text)
@@ -26,6 +26,19 @@ type Status
     = Loading
     | Loaded (List Photo) String
     | Errored String
+
+
+
+---- Ports ----
+
+
+port setFilters : FilterOptions -> Cmd msg
+
+
+type alias FilterOptions =
+    { url : String
+    , filters : List { name : String, amount : Int }
+    }
 
 
 
@@ -287,3 +300,7 @@ onSlide toMsg =
     at [ "detail", "userSlidTo" ] int
         |> Json.Decode.map toMsg
         |> on "slide"
+
+
+
+---- Port Filter ----
