@@ -3,7 +3,8 @@ import {Elm} from './Main.elm';
 import * as serviceWorker from './serviceWorker';
 
 let app = Elm.Main.init({
-  node: document.getElementById('root')
+  node: document.getElementById('root'),
+  flags: Pasta.version
 });
 
 app.ports.setFilters.subscribe((options) => {
@@ -12,8 +13,17 @@ app.ports.setFilters.subscribe((options) => {
   )
 });
 
+Pasta.addActivityListener((activity) => {
+  console.log("got some activity to send to elm: ", activity);
+  app.ports.activityChanges.send(activity);
+})
 
 class RangeSlider extends HTMLElement {
+  constructor() {
+    super();
+    this.val = null;
+  }
+
   connectedCallback() {
     const input = document.createElement('input');
     this.appendChild(input);
@@ -33,8 +43,6 @@ class RangeSlider extends HTMLElement {
       this.dispatchEvent(event)
     })
   }
-
-
 }
 
 window.customElements.define("range-slider", RangeSlider);
