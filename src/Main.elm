@@ -1,9 +1,8 @@
 module Main exposing (..)
 
-import Browser
 import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (src)
-import PhotoGroove exposing (hum)
+import PhotoGroove
 
 
 
@@ -50,7 +49,7 @@ view model =
 
 
 main =
-    hum
+    PhotoGroove.main
 
 
 

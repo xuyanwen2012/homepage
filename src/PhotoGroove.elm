@@ -1,7 +1,7 @@
-port module PhotoGroove exposing (hum)
+port module PhotoGroove exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, h1, img, input, label, node, text)
+import Html exposing (Html, button, canvas, div, h1, img, input, label, node, text)
 import Html.Attributes as Attr exposing (class, classList, id, name, src, title, type_)
 import Html.Events exposing (on, onClick)
 import Http
@@ -37,7 +37,7 @@ port setFilters : FilterOptions -> Cmd msg
 
 type alias FilterOptions =
     { url : String
-    , filters : List { name : String, amount : Int }
+    , filters : List { name : String, amount : Float }
     }
 
 
@@ -115,7 +115,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ClickedPhoto url ->
-            ( { model | status = selectUrl url model.status }, Cmd.none )
+            applyFilters { model | status = selectUrl url model.status }
 
         ClickedSize size ->
             ( { model | chosenSize = size }, Cmd.none )
@@ -131,7 +131,7 @@ update msg model =
                     ( model, Cmd.none )
 
         GotRandomPhoto photo ->
-            ( { model | status = selectUrl photo.url model.status }, Cmd.none )
+            applyFilters { model | status = selectUrl photo.url model.status }
 
         GotPhotos (Ok photos) ->
             case photos of
@@ -145,13 +145,36 @@ update msg model =
             ( { model | status = Errored "Server Error!" }, Cmd.none )
 
         SlidHue hue ->
-            ( { model | hue = hue }, Cmd.none )
+            applyFilters { model | hue = hue }
 
         SlidRipple ripple ->
-            ( { model | hue = ripple }, Cmd.none )
+            applyFilters { model | ripple = ripple }
 
         SlidNoise noise ->
-            ( { model | hue = noise }, Cmd.none )
+            applyFilters { model | noise = noise }
+
+
+applyFilters : Model -> ( Model, Cmd Msg )
+applyFilters model =
+    case model.status of
+        Loaded _ selectedUrl ->
+            let
+                filters =
+                    [ { name = "Hue", amount = toFloat model.hue / 11 }
+                    , { name = "Ripple", amount = toFloat model.ripple / 11 }
+                    , { name = "Noise", amount = toFloat model.noise / 11 }
+                    ]
+
+                url =
+                    urlPrefix ++ "large/" ++ selectedUrl
+            in
+            ( model, setFilters { url = url, filters = filters } )
+
+        Errored _ ->
+            ( model, Cmd.none )
+
+        Loading ->
+            ( model, Cmd.none )
 
 
 selectUrl : String -> Status -> Status
@@ -200,9 +223,9 @@ viewLoaded photos selectedUrl model =
         (List.map viewSizeChooser [ Small, Medium, Large ])
     , div [ id "thumbnails", class (sizeToClass model.chosenSize) ]
         (List.map (viewThumbnail selectedUrl) photos)
-    , img
-        [ class "large"
-        , src (urlPrefix ++ "large/" ++ selectedUrl)
+    , canvas
+        [ id "main-canvas"
+        , class "large"
         ]
         []
     ]
@@ -276,8 +299,8 @@ sizeToClass size =
 ---- PROGRAM ----
 
 
-hum : Program () Model Msg
-hum =
+main : Program () Model Msg
+main =
     Browser.element
         { init = \_ -> init
         , view = view
