@@ -7,7 +7,9 @@ let app = Elm.Main.init({
 });
 
 app.ports.setFilters.subscribe((options) => {
-  Pasta.apply(document.getElementById("main-canvas"), options)
+  requestAnimationFrame(() =>
+    Pasta.apply(document.getElementById("main-canvas"), options)
+  )
 });
 
 
