@@ -10,7 +10,24 @@ import Json.Decode.Pipeline exposing (required)
 
 
 
--- Model
+-- Constants
+
+
+urlPrefix : String
+urlPrefix =
+    "http://elm-in-action.com/"
+
+
+
+-- Models
+
+
+type alias Photo =
+    { title : String
+    , size : Int
+    , relatedUrls : List String
+    , url : String
+    }
 
 
 type alias Model =
@@ -27,7 +44,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( initialModel
     , Http.get
-        { url = "http://elm-in-action/folders/list"
+        { url = urlPrefix ++ "/folders/list"
         , expect = Http.expectJson GotInitialModel modelDecoder
         }
     )
@@ -71,6 +88,31 @@ update msg model =
 view : Model -> Html Msg
 view model =
     h1 [] [ text "The Grooviest Folders the world has ever seen" ]
+
+
+viewSelectedPhoto : Photo -> Html Msg
+viewSelectedPhoto photo =
+    div
+        [ class "selected-photo" ]
+        [ h2 [] [ text photo.title ]
+        , img [ src (urlPrefix ++ photo.url) ] []
+        , span [] [ text (String.fromInt photo.size ++ "KB") ]
+        , h3 [] [ text "Related" ]
+        ]
+
+
+viewRelatedPhoto : String -> Html Msg
+viewRelatedPhoto url =
+    div
+        [ class "related-photo"
+        , onClick (ClickedPhoto url)
+        , src (urlPrefix ++ "photos/" ++ url ++ "/thumb")
+        ]
+        []
+
+
+
+-- Main Program
 
 
 main =
