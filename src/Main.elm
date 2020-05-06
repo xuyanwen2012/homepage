@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (src)
+import PhotoFolders
 import PhotoGroove
 
 
@@ -49,7 +50,7 @@ view model =
 
 
 main =
-    PhotoGroove.main
+    PhotoFolders.main
 
 
 
