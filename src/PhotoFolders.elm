@@ -20,6 +20,84 @@ urlPrefix =
 
 
 
+-- Json
+
+
+type alias JsonPhoto =
+    { title : String
+    , size : Int
+    , relatedUrls : List String
+    }
+
+
+jsonDecoder : Decoder JsonPhoto
+jsonDecoder =
+    Decode.succeed JsonPhoto
+        |> required "title" string
+        |> required "size" int
+        |> required "related_photos" (list string)
+
+
+{-| Our decoder decodes the "photos" field of Folder
+-}
+photosDecoder : Decoder (Dict String Photo)
+photosDecoder =
+    Decode.keyValuePairs jsonDecoder
+        |> Decode.map fromPairs
+
+
+folderDecoder : Decoder Folder
+folderDecoder =
+    Decode.succeed folderFromJson
+        |> required "name" string
+        |> required "photos" photosDecoder
+        |> required "subfolders" (Decode.lazy (\_ -> list folderDecoder))
+
+
+modelPhotoDecoder : Decoder (Dict String Photo)
+modelPhotoDecoder =
+    Decode.succeed modelPhotoFromJson
+        |> required "photos" photosDecoder
+        |> required "subfolders" (Decode.lazy (\_ -> list modelPhotoDecoder))
+
+
+folderFromJson : String -> Dict String Photo -> List Folder -> Folder
+folderFromJson name photos subfolders =
+    Folder
+        { name = name
+        , expanded = True
+        , photoUrls = Dict.keys photos
+        , subfolders = subfolders
+        }
+
+
+finishPhoto : ( String, JsonPhoto ) -> ( String, Photo )
+finishPhoto ( url, json ) =
+    ( url
+    , { url = url
+      , size = json.size
+      , title = json.title
+      , relatedUrls = json.relatedUrls
+      }
+    )
+
+
+fromPairs : List ( String, JsonPhoto ) -> Dict String Photo
+fromPairs pairs =
+    pairs
+        |> List.map finishPhoto
+        |> Dict.fromList
+
+
+modelPhotoFromJson :
+    Dict String Photo
+    -> List (Dict String Photo)
+    -> Dict String Photo
+modelPhotoFromJson folderPhotos subfolderPhotos =
+    List.foldl Dict.union folderPhotos subfolderPhotos
+
+
+
 -- Models
 
 
@@ -88,79 +166,12 @@ type Msg
 
 modelDecoder : Decoder Model
 modelDecoder =
-    Decode.succeed
-        { selectedUrl = Just "trevi"
-        , photos =
-            Dict.fromList
-                [ ( "trevi"
-                  , { title = "Trevi"
-                    , relatedUrls = [ "coli", "fresco" ]
-                    , size = 34
-                    , url = "trevi"
-                    }
-                  )
-                , ( "fresco"
-                  , { title = "Fresco"
-                    , relatedUrls = [ "trevi" ]
-                    , size = 46
-                    , url = "fresco"
-                    }
-                  )
-                , ( "coli"
-                  , { title = "Coliseum"
-                    , relatedUrls = [ "trevi", "fresco" ]
-                    , size = 36
-                    , url = "coli"
-                    }
-                  )
-                ]
-        , root =
-            Folder
-                { name = "Photos"
-                , expanded = True
-                , photoUrls = []
-                , subfolders =
-                    [ Folder
-                        { name = "2016"
-                        , expanded = True
-                        , photoUrls = [ "trevi", "coli" ]
-                        , subfolders =
-                            [ Folder
-                                { name = "outdoors"
-                                , expanded = True
-                                , photoUrls = []
-                                , subfolders = []
-                                }
-                            , Folder
-                                { name = "indoors"
-                                , expanded = True
-                                , photoUrls = [ "fresco" ]
-                                , subfolders = []
-                                }
-                            ]
-                        }
-                    , Folder
-                        { name = "2017"
-                        , expanded = True
-                        , photoUrls = []
-                        , subfolders =
-                            [ Folder
-                                { name = "outdoors"
-                                , expanded = True
-                                , photoUrls = []
-                                , subfolders = []
-                                }
-                            , Folder
-                                { name = "indoors"
-                                , expanded = True
-                                , photoUrls = []
-                                , subfolders = []
-                                }
-                            ]
-                        }
-                    ]
-                }
-        }
+    Decode.map2
+        (\photos root ->
+            { photos = photos, root = root, selectedUrl = Nothing }
+        )
+        modelPhotoDecoder
+        folderDecoder
 
 
 
