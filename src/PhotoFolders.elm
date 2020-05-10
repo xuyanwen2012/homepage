@@ -1,4 +1,4 @@
-module PhotoFolders exposing (main)
+module PhotoFolders exposing (Model, Msg, init, update, view)
 
 import Browser
 import Dict exposing (Dict)
@@ -144,9 +144,9 @@ initialModel =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( initialModel
+init : Maybe String -> ( Model, Cmd Msg )
+init selectedFilename =
+    ( { initialModel | selectedUrl = selectedFilename }
     , Http.get
         { url = urlPrefix ++ "folders/list"
         , expect = Http.expectJson GotInitialModel modelDecoder
@@ -238,8 +238,7 @@ view model =
     in
     div [ class "content" ]
         [ div [ class "folders" ]
-            [ h1 [] [ text "Folders" ]
-            , viewFolder End model.root
+            [ viewFolder End model.root
             ]
         , div [ class "selected-photo" ] [ selectedPhoto ]
         ]
@@ -308,16 +307,3 @@ appendIndex index path =
 
         Subfolder subfolderIndex remainingPath ->
             Subfolder subfolderIndex (appendIndex index remainingPath)
-
-
-
--- Main Program
-
-
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = \_ -> Sub.none
-        }

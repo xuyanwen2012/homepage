@@ -7,17 +7,6 @@ let app = Elm.Main.init({
   flags: Pasta.version
 });
 
-// app.ports.setFilters.subscribe((options) => {
-//   requestAnimationFrame(() =>
-//     Pasta.apply(document.getElementById("main-canvas"), options)
-//   )
-// });
-//
-// Pasta.addActivityListener((activity) => {
-//   console.log("got some activity to send to elm: ", activity);
-//   app.ports.activityChanges.send(activity);
-// })
-
 class RangeSlider extends HTMLElement {
   constructor() {
     super();

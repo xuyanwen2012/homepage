@@ -1,7 +1,7 @@
-port module PhotoGroove exposing (main)
+port module PhotoGallery exposing (Model, Msg, init, subscriptions, update, view)
 
 import Browser
-import Html exposing (Html, button, canvas, div, h1, img, input, label, node, text)
+import Html exposing (..)
 import Html.Attributes as Attr exposing (class, classList, id, name, src, title, type_)
 import Html.Events exposing (on, onClick)
 import Http
@@ -232,8 +232,7 @@ view model =
 
 viewLoaded : List Photo -> String -> Model -> List (Html Msg)
 viewLoaded photos selectedUrl model =
-    [ h1 [] [ text "Photo Groove" ]
-    , button
+    [ button
         [ onClick ClickedSurpriseMe ]
         [ text "Surprise  Me!" ]
     , div [ class "activity" ] [ text model.activity ]
@@ -322,14 +321,9 @@ sizeToClass size =
 ---- PROGRAM ----
 
 
-main : Program Float Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = \_ -> activityChanges GotActivity
-        }
+subscriptions : a -> Sub Msg
+subscriptions _ =
+    activityChanges GotActivity
 
 
 
