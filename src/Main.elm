@@ -10,7 +10,7 @@ import PhotoGallery as Gallery
 import Url exposing (Url)
 import Url.Parser as Parser exposing ((</>), Parser, s, string)
 
-
+ 
 type alias Model =
     { page : Page
     , key : Nav.Key
